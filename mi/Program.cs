@@ -20,7 +20,9 @@ namespace mi
             var pipeline = context.Transforms.Text.FeaturizeText("Text", "oceanproximity")
                 .Append(context.Transforms.Concatenate("Features", features))
                 .Append(context.Transforms.Concatenate("Features", "Features", "Text"))
-                .Append(context.Regression.Trainers.LbfgsPoissonRegression);
+                .Append(context.Transforms.Concatenate("Features", "Text", "Features"))
+                .Append(context.Transforms.Concatenate("Text", "Features", "Features"))
+                .Append(context.Regression.Trainers.LbfgsPoissonRegression());
 
             var model = pipeline.Fit(split.TrainSet);
 
