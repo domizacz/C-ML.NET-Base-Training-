@@ -1,4 +1,5 @@
 ﻿using Microsoft.ML;
+using Microsoft.ML.Data;
 using System;
 using System.Linq;
 
@@ -19,9 +20,6 @@ namespace mi
                 .ToArray();
             var pipeline = context.Transforms.Text.FeaturizeText("Text", "oceanproximity")
                 .Append(context.Transforms.Concatenate("Features", features))
-                .Append(context.Transforms.Concatenate("Features", "Features", "Text"))
-                .Append(context.Transforms.Concatenate("Features", "Text", "Features"))
-                .Append(context.Transforms.Concatenate("Text", "Features", "Features"))
                 .Append(context.Regression.Trainers.LbfgsPoissonRegression());
 
             var model = pipeline.Fit(split.TrainSet);
@@ -31,7 +29,19 @@ namespace mi
             var metrics = context.Regression.Evaluate(predictions);
 
             Console.WriteLine($"R^2 - {metrics.RSquared}");
+
+            var newdata = new HousingData
+            {
+            oceanproximity = "OCEAN"
+            };
+
+            var predictionFunc = context.Model.CreatePredictionEngine<HousingData, SallePRodukction>(model);
+            var prodiction = predictionFunc.Predict(newdata);
+            Console.WriteLine($"Prediction - {prodiction.prodoceanproximity}");
+
             Console.ReadLine();
         }
     }
+
+   
 }
