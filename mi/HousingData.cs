@@ -7,7 +7,7 @@ namespace mi
         [LoadColumn(0)]
         public float Longitude { get; set; }
         [LoadColumn(1)]
-        public float latitude { get; set; }
+        public float Latitude { get; set; }
         [LoadColumn(2)]
         public float housingMedianAge { get; set; }
         [LoadColumn(3)]

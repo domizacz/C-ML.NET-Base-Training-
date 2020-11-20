@@ -35,7 +35,7 @@ namespace mi
             oceanproximity = "OCEAN"
             };
 
-            var predictionFunc = context.Model.CreatePredictionEngine<HousingData, SallePRodukction>(model);
+            var predictionFunc = context.Model.CreatePredictionEngine<HousingData, SallePRodukction >(model);
             var prodiction = predictionFunc.Predict(newdata);
             Console.WriteLine($"Prediction - {prodiction.prodoceanproximity}");
 
