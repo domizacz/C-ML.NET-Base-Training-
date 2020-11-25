@@ -9,37 +9,70 @@ namespace mi
     {
         static void Main(string[] args)
         {
+
+
+            //Step 1. Create an ML Context
             var context = new MLContext();
-            var data = context.Data.LoadFromTextFile<HousingData>("./housing.csv", hasHeader: true, separatorChar: ',');
-            
-            var split = context.Data.TrainTestSplit(data, testFraction: 0.2);
 
-            var features = split.TrainSet.Schema
-                .Select(col => col.Name)
-                .Where(colName => colName != "Label" && colName != "oceanproximity")
-                .ToArray();
-            var pipeline = context.Transforms.Text.FeaturizeText("Text", "oceanproximity")
-                .Append(context.Transforms.Concatenate("Features", features))
-                .Append(context.Regression.Trainers.LbfgsPoissonRegression());
+            //Step 2. Read in the input data from a text file for model training
+            IDataView trainingData = context.Data.LoadFromTextFile<SalaryData>("./s.txt", separatorChar: ',', hasHeader: true);
 
-            var model = pipeline.Fit(split.TrainSet);
+            var testtraondata = context.Data.TrainTestSplit(trainingData, testFraction: 0.2);
 
-            var predictions = model.Transform(split.TestSet);
+            var pipeline = context.Transforms.Concatenate("Features", "YearsExperience")
+                 .Append(context.Regression.Trainers.LbfgsPoissonRegression());
+            var model = pipeline.Fit(testtraondata.TrainSet);
 
-            var metrics = context.Regression.Evaluate(predictions);
+            var predictions = model.Transform(testtraondata.TestSet);
 
-            Console.WriteLine($"R^2 - {metrics.RSquared}");
+            var metric = context.Regression.Evaluate(predictions);
 
-            var newdata = new HousingData
+            Console.WriteLine($"R 2 - {metric.RSquared}");
+
+
+            var newdata = new SalaryData
             {
-            oceanproximity = "OCEAN"
-            };
+                YearsExperience = 1.1f
+        };
+            var predictionfun = context.Model.CreatePredictionEngine<SalaryData, SalaryPred>(model);
+            var prodiction = predictionfun.Predict(newdata);
 
-            var predictionFunc = context.Model.CreatePredictionEngine<HousingData, SallePRodukction >(model);
-            var prodiction = predictionFunc.Predict(newdata);
-            Console.WriteLine($"Prediction - {prodiction.prodoceanproximity}");
+            Console.WriteLine($"Prodiction -{prodiction.ProdictedSalary} ");
 
             Console.ReadLine();
+            
+            
+            //var context = new MLContext();
+            //var data = context.Data.LoadFromTextFile<HousingData>("./housing.csv", hasHeader: true, separatorChar: ',');
+
+            //var split = context.Data.TrainTestSplit(data, testFraction: 0.2);
+
+            //var features = split.TrainSet.Schema
+            //    .Select(col => col.Name)
+            //    .Where(colName => colName != "Label" && colName != "oceanproximity")
+            //    .ToArray();
+            //var pipeline = context.Transforms.Text.FeaturizeText("Text", "oceanproximity")
+            //    .Append(context.Transforms.Concatenate("Features", features))
+            //    .Append(context.Regression.Trainers.LbfgsPoissonRegression());
+
+            //var model = pipeline.Fit(split.TrainSet);
+
+            //var predictions = model.Transform(split.TestSet);
+
+            //var metrics = context.Regression.Evaluate(predictions);
+
+            //Console.WriteLine($"R^2 - {metrics.RSquared}");
+
+            //var newdata = new HousingData
+            //{
+            //oceanproximity = "OCEAN"
+            //};
+
+            //var predictionFunc = context.Model.CreatePredictionEngine<HousingData, SallePRodukction >(model);
+            //var prodiction = predictionFunc.Predict(newdata);
+            //Console.WriteLine($"Prediction - {prodiction.prodoceanproximity}");
+
+            //Console.ReadLine();
         }
     }
 
