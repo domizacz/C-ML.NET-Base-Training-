@@ -32,7 +32,7 @@ namespace mi
 
             var newdata = new SalaryData
             {
-                YearsExperience = 1.1f
+                YearsExperience = 2
         };
             var predictionfun = context.Model.CreatePredictionEngine<SalaryData, SalaryPred>(model);
             var prodiction = predictionfun.Predict(newdata);
